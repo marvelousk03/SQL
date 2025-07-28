@@ -142,3 +142,63 @@ FROM us_counties_2010;
 SELECT percentile_cont(array[.1,.2,.3,.4,.5,.6,.7,.8,.9])
        WITHIN GROUP (ORDER BY p0010001) AS "deciles"
 FROM us_counties_2010;
+
+-- Listing 5-13: Using unnest() to turn an array into rows
+
+SELECT unnest(
+            percentile_cont(array[.25,.5,.75])
+            WITHIN GROUP (ORDER BY p0010001)
+            ) AS "quartiles"
+FROM us_counties_2010;
+
+-- Listing 5-14: Creating a median() aggregate function in PostgreSQL
+-- NOTE: As of PostgreSQL 14, this function no longer works, and for that
+-- reason it was not included in the 2nd Edition of Practical SQL.
+-- Use percentile_cont(.5) to find the median.
+
+-- Source: https://wiki.postgresql.org/wiki/Aggregate_Median
+
+CREATE OR REPLACE FUNCTION _final_median(anyarray)
+   RETURNS float8 AS
+$$
+  WITH q AS
+  (
+     SELECT val
+     FROM unnest($1) val
+     WHERE VAL IS NOT NULL
+     ORDER BY 1
+  ),
+  cnt AS
+  (
+    SELECT COUNT(*) AS c FROM q
+  )
+  SELECT AVG(val)::float8
+  FROM
+  (
+    SELECT val FROM q
+    LIMIT  2 - MOD((SELECT c FROM cnt), 2)
+    OFFSET GREATEST(CEIL((SELECT c FROM cnt) / 2.0) - 1,0)
+  ) q2;
+$$
+LANGUAGE sql IMMUTABLE;
+
+CREATE AGGREGATE median(anyelement) (
+  SFUNC=array_append,
+  STYPE=anyarray,
+  FINALFUNC=_final_median,
+  INITCOND='{}'
+);
+
+-- Listing 5-15: Using a median() aggregate function
+
+SELECT sum(p0010001) AS "County Sum",
+       round(avg(p0010001), 0) AS "County Average",
+       median(p0010001) AS "County Median",
+       percentile_cont(.5)
+       WITHIN GROUP (ORDER BY P0010001) AS "50th Percentile"
+FROM us_counties_2010;
+
+-- Listing 5-16: Finding the most-frequent value with mode()
+
+SELECT mode() WITHIN GROUP (ORDER BY p0010001)
+FROM us_counties_2010;
