@@ -1,0 +1,11 @@
+geo_name:state_us_abbreviation:area_land:area_water
+Falls Church city:VA:5176813:6
+Lexington city:VA:6466940:68429
+Manassas Park city:VA:6562394:2623
+Covington city:VA:14163340:522061
+Fairfax city:VA:16159465:95054
+Buena Vista city:VA:17362236:223855
+Bedford city:VA:17814175:61318
+Emporia city:VA:17854907:191799
+Norton city:VA:19375334:89169
+Colonial Heights city:VA:19476234:757309
