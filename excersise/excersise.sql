@@ -204,5 +204,16 @@ SELECT *
 FROM employees2 e
 WHERE AGE(CURRENT_DATE, e.birthdate) >= INTERVAL '27 years';
 
+--chapter15 exercise
+
+CREATE OR REPLACE FUNCTION multiply(num1 numeric, num2 numeric)
+RETURNS numeric AS $$
+BEGIN
+    RETURN (num1 *  num2);
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT multiply(4, 4);
+
 
 
